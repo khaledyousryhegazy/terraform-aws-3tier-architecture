@@ -35,6 +35,7 @@ module "autoscaling" {
   enable_monitoring = true
 
   iam_instance_profile_name = var.instance_profile_name
+  user_data                 = base64encode(file("${path.module}/userData.sh"))
 
   block_device_mappings = [
     {
