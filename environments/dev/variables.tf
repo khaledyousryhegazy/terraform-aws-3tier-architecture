@@ -5,3 +5,7 @@ variable "vpc_cidr" {
 variable "instance_type" {
   type = string
 }
+
+variable "db_username" {
+  type = string
+}

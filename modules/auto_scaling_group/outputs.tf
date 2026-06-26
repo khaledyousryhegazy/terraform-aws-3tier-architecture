@@ -17,3 +17,4 @@ output "launch_template_latest_version" {
 output "autoscaling_group_id" {
   value = module.autoscaling.autoscaling_group_id
 }
+

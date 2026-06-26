@@ -76,8 +76,8 @@ module "db_sg" {
 
   ingress_rules = {
     mysql-from-app = {
-      from_port                    = 3306
-      to_port                      = 3306
+      from_port                    = 5432
+      to_port                      = 5432
       ip_protocol                  = "tcp"
       referenced_security_group_id = module.app_sg.id
     }

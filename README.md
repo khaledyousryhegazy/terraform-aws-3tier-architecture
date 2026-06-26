@@ -6,10 +6,10 @@
 4.  ~~IAM~~
 5.  ~~Launch Template~~
 6.  ~~Auto Scaling Group~~
-7.  ~~ALB
-8.  ~~RDS
+7.  ~~ALB~~
+8.  ~~RDS~~
 9.  ~~CloudWatch
-10. ~~Backend State
+10. ~~Backend State~~
 11. ~~README
 12. ~~Checking & Testing (if can add more advantages)
 
