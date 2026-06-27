@@ -1,52 +1,3 @@
-# module "vpc_endpoints" {
-#   source = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
-
-#   vpc_id = var.vpc_id
-
-#   create_security_group      = true
-#   security_group_name_prefix = "${var.name_prefix}-vpc-endpoints-"
-#   security_group_description = "VPC endpoint security group"
-
-#   security_group_rules = {
-#     ingress_https = {
-#       description = "HTTPS from VPC"
-#       cidr_blocks = [var.vpc_cidr]
-#     }
-#   }
-
-#   endpoints = {
-#     s3 = {
-#       service             = "s3"
-#       private_dns_enabled = true
-#       dns_options = {
-#         private_dns_only_for_inbound_resolver_endpoint = false
-#       }
-#       tags = { Name = "${var.name_prefix}-s3-vpc-endpoint" }
-#     }
-#     rds = {
-#       service             = "rds"
-#       private_dns_enabled = true
-#       subnet_ids          = var.private_subnets
-#       security_group_ids  = [var.db_sg_id]
-#     },
-#     ssm = {
-#       service             = "ssm"
-#       subnet_ids          = var.private_subnets
-#       private_dns_enabled = true
-#     },
-#     ssmmessages = {
-#       service             = "ssmmessages"
-#       subnet_ids          = var.private_subnets
-#       private_dns_enabled = true
-#     },
-#     ec2messages = {
-#       service             = "ec2messages"
-#       subnet_ids          = var.private_subnets
-#       private_dns_enabled = true
-#     }
-#   }
-# }
-
 module "vpc_endpoints" {
   source = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
 
@@ -58,38 +9,37 @@ module "vpc_endpoints" {
 
   security_group_rules = {
     ingress_https = {
-      description = "HTTPS from VPC"
+      description = "HTTPS from app instances"
+      from_port   = 443
+      to_port     = 443
+      ip_protocol = "tcp"
       cidr_blocks = [var.vpc_cidr]
     }
   }
+}
 
-  endpoints = {
-    s3 = {
-      service         = "s3"
-      service_type    = "Gateway"
-      route_table_ids = var.private_route_table_ids
-      tags            = { Name = "${var.name_prefix}-s3-endpoint" }
-    }
+resource "aws_vpc_endpoint" "ssm_endpoints" {
+  for_each = toset(["ssm", "ssmmessages", "ec2messages"])
 
-    ssm = {
-      service             = "ssm"
-      subnet_ids          = var.private_subnets
-      private_dns_enabled = true
-      security_group_ids  = [module.vpc_endpoints.security_group_id]
-    }
+  vpc_id              = var.vpc_id
+  service_name        = "com.amazonaws.${var.region}.${each.value}"
+  vpc_endpoint_type   = "Interface"
+  private_dns_enabled = true
+  subnet_ids          = var.private_subnets
+  security_group_ids  = [module.vpc_endpoints.security_group_id]
 
-    ssmmessages = {
-      service             = "ssmmessages"
-      subnet_ids          = var.private_subnets
-      private_dns_enabled = true
-      security_group_ids  = [module.vpc_endpoints.security_group_id]
-    }
+  tags = {
+    Name = "${var.name_prefix}-${each.value}-endpoint"
+  }
+}
 
-    ec2messages = {
-      service             = "ec2messages"
-      subnet_ids          = var.private_subnets
-      private_dns_enabled = true
-      security_group_ids  = [module.vpc_endpoints.security_group_id]
-    }
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id            = var.vpc_id
+  service_name      = "com.amazonaws.${var.region}.s3"
+  vpc_endpoint_type = "Gateway"
+  route_table_ids   = var.private_route_table_ids
+
+  tags = {
+    Name = "${var.name_prefix}-s3-endpoint"
   }
 }

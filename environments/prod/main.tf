@@ -9,12 +9,14 @@ module "vpc" {
 
 # VPC endpoints module
 module "vpc_endpoints" {
-  source          = "../../modules/vpc_endpoints"
-  vpc_id          = module.vpc.vpc_id
-  vpc_cidr        = var.vpc_cidr
-  name_prefix     = local.name_prefix
-  private_subnets = module.vpc.private_subnets
-  db_sg_id        = module.security_groups.db_sg_id
+  source                  = "../../modules/vpc_endpoints"
+  vpc_id                  = module.vpc.vpc_id
+  vpc_cidr                = var.vpc_cidr
+  name_prefix             = local.name_prefix
+  private_subnets         = module.vpc.private_subnets
+  db_sg_id                = module.security_groups.db_sg_id
+  private_route_table_ids = module.vpc.private_route_table_ids
+  region                  = local.region
 }
 
 # Security groups module
@@ -42,15 +44,17 @@ module "autoscaling_group" {
   instance_type         = var.instance_type
   app_sg_id             = module.security_groups.app_sg_id
   instance_profile_name = module.iam.instance_profile_name
+  instance_profile_arn  = module.iam.instance_profile_arn
+  target_group_arn      = module.alb.target_group_arn
 }
 
 # ALB module
 module "alb" {
-  source         = "../../modules/alb"
-  vpc_id         = module.vpc.vpc_id
-  alb_sg_id      = module.security_groups.alb_sg_id
-  name_prefix    = local.name_prefix
-  public_subnets = module.vpc.public_subnets
+  source            = "../../modules/alb"
+  vpc_id            = module.vpc.vpc_id
+  alb_sg_id         = module.security_groups.alb_sg_id
+  name_prefix       = local.name_prefix
+  public_subnets    = module.vpc.public_subnets
   target_group_name = var.target_group_name
 }
 

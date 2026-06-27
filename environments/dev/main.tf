@@ -16,6 +16,7 @@ module "vpc_endpoints" {
   private_subnets         = module.vpc.private_subnets
   db_sg_id                = module.security_groups.db_sg_id
   private_route_table_ids = module.vpc.private_route_table_ids
+  region                  = local.region
 }
 
 # Security groups module

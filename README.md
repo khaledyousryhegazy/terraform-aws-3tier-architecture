@@ -1,45 +1,39 @@
 # Terraform AWS 3-Tier Architecture
 
-## Overview
+A production-style, highly available 3-tier infrastructure on AWS, built with Terraform and organized into reusable modules following IaC best practices.
 
-This project provisions a production-style highly available 3-tier architecture on AWS using Terraform.
-
-The infrastructure is modular, reusable, and follows Infrastructure as Code (IaC) best practices.
-
-## Note: Production environments should use AWS Certificate Manager (ACM) with Route53 to enable HTTPS.
+---
 
 ## Architecture
 
 ```
-                Internet
-                    │
-                    ▼
-        Application Load Balancer
-                    │
-                    ▼
-        Auto Scaling Group (EC2)
-                    │
-                    ▼
-            PostgreSQL RDS
+         Internet
+             │
+             ▼
+ Application Load Balancer  (Public Subnets)
+             │
+             ▼
+  Auto Scaling Group / EC2  (Private Subnets)
+             │
+             ▼
+      PostgreSQL RDS         (Private DB Subnets)
 ```
 
 ---
 
-## Technologies
+## Stack
 
-- Terraform
-- AWS
-- VPC
-- EC2
-- Auto Scaling Group
-- Launch Template
-- Application Load Balancer
-- RDS PostgreSQL
-- IAM
-- Security Groups
-- CloudWatch
-- SNS
-- Apache HTTP Server
+| Layer          | Technology                                    |
+| -------------- | --------------------------------------------- |
+| IaC            | Terraform                                     |
+| Compute        | EC2, Auto Scaling Group, Launch Template      |
+| Networking     | VPC, Subnets, IGW, NAT Gateway, VPC Endpoints |
+| Load Balancing | Application Load Balancer                     |
+| Database       | RDS PostgreSQL (Multi-AZ)                     |
+| Security       | IAM, Security Groups                          |
+| Monitoring     | CloudWatch Agent, Dashboard, Alarms           |
+| Notifications  | SNS (email alerts)                            |
+| Web Server     | Apache HTTP Server (via User Data)            |
 
 ---
 
@@ -47,7 +41,6 @@ The infrastructure is modular, reusable, and follows Infrastructure as Code (IaC
 
 ```
 .
-├── assets/
 ├── environments/
 │   ├── dev/
 │   └── prod/
@@ -58,6 +51,7 @@ The infrastructure is modular, reusable, and follows Infrastructure as Code (IaC
 │   ├── iam/
 │   ├── rds/
 │   ├── security_groups/
+│   ├── sns/
 │   ├── vpc/
 │   └── vpc_endpoints/
 ├── scripts/
@@ -67,149 +61,32 @@ The infrastructure is modular, reusable, and follows Infrastructure as Code (IaC
 
 ---
 
-## Infrastructure Components
+## Security Highlights
 
-### Networking
-
-- Custom VPC
-- Public and Private Subnets
-- Internet Gateway
-- NAT Gateway
-- Route Tables
-- VPC Endpoints
+- Least privilege IAM role for EC2
+- Separate security groups per tier (ALB → App → DB)
+- EC2 instances in private subnets (no public IPs)
+- RDS in isolated DB subnets
+- VPC Endpoints for SSM, SSMMessages, EC2Messages, and S3 (no traffic over public internet)
+- SSM Session Manager access instead of open SSH
 
 ---
 
-### Security
+## Monitoring & Alerts
 
-- Separate Security Groups for:
-  - Application Load Balancer
-  - EC2 Instances
-  - PostgreSQL RDS
-
-- Least privilege IAM Role for EC2
-
----
-
-### Compute
-
-- Launch Template
-- Auto Scaling Group
-- Apache installed automatically using User Data
-- CloudWatch Agent installed automatically
-- EC2 instances deployed in private subnets
-
----
-
-### Load Balancer
-
-- Application Load Balancer
-- HTTP Listener
-- Target Group
-- Health Checks
-- Automatic registration of Auto Scaling instances
-
----
-
-### Database
-
-- PostgreSQL RDS
-- Private DB Subnet Group
-- Storage Encryption
-- Enhanced Monitoring
-- Performance Insights
-- Automated Backups
-- Deletion Protection
-- Multi-AZ deployment
-
----
-
-### Monitoring
-
-CloudWatch Agent collects:
-
-- CPU Utilization
-- Memory Usage
-- Disk Usage
-
-CloudWatch Dashboard includes:
-
-- EC2 CPU Utilization
-- EC2 Memory Usage
-- EC2 Disk Usage
-- ALB Request Count
-- RDS CPU Utilization
-- RDS Free Storage
-
-CloudWatch Alarm:
-
-- EC2 CPU Utilization > 70%
-
----
-
-### Notifications
-
-Amazon SNS sends email notifications for:
-
-- CloudWatch Alarms
-- Auto Scaling Launch Events
-- Auto Scaling Termination Events
-- Auto Scaling Errors
-
----
-
-## User Data
-
-Each EC2 instance automatically:
-
-- Updates the operating system
-- Installs Apache HTTP Server
-- Installs Amazon CloudWatch Agent
-- Creates a sample web page
-- Starts required services
-- Enables services on boot
-
----
-
-## High Availability
-
-- Multi-AZ VPC Design
-- Application Load Balancer
-- Auto Scaling Group
-- Multi-AZ PostgreSQL Database
-
----
-
-## Terraform Modules
-
-- VPC
-- Security Groups
-- IAM
-- Auto Scaling Group
-- Application Load Balancer
-- RDS PostgreSQL
-- CloudWatch
-- SNS
+- CloudWatch Agent collects CPU, memory, and disk metrics
+- CloudWatch Dashboard with ALB, EC2, and RDS metrics
+- CloudWatch Alarm triggers at EC2 CPU > 70%
+- SNS email notifications for alarms and ASG lifecycle events (launch, terminate, errors)
 
 ---
 
 ## Deployment
 
 ```bash
-terraform init
-
+cd /environment/dev
+terraform init -backend-init=backend.hcl
 terraform plan
-
 terraform apply
+terraform destroy
 ```
-
----
-
-## Future Improvements (for Production)
-
-- HTTPS using AWS Certificate Manager (ACM)
-- Route 53 DNS
-- AWS WAF
-- GitHub Actions CI/CD
-- AWS Secrets Manager for database credentials
-- KMS Customer Managed Keys

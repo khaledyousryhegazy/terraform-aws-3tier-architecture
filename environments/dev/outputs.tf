@@ -33,14 +33,14 @@ output "nat_public_ips" {
 ####################################################
 # VPC endpoints
 # S3 endpoint id
-output "s3_endpoint_id" {
-  value = module.vpc_endpoints.vpc_endpoints.s3.id
-}
+# output "s3_endpoint_id" {
+#   value = module.vpc_endpoints.vpc_endpoints.s3.id
+# }
 
 # SSM endpoint id
-output "ssm_endpoint_id" {
-  value = module.vpc_endpoints.vpc_endpoints.ssm.id
-}
+# output "ssm_endpoint_id" {
+#   value = module.vpc_endpoints.vpc_endpoints.ssm.id
+# }
 
 ####################################################
 # ASG outputs

@@ -3,6 +3,7 @@
 *.tfstate
 *.tfstate.*
 .terraform.lock.hcl
+terraform-key.pem
 
 # Variables
 *.tfvars

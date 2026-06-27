@@ -19,3 +19,7 @@ variable "db_sg_id" {
 variable "private_route_table_ids" {
 
 }
+
+variable "region" {
+  type = string
+}
