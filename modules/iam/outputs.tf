@@ -1,3 +1,7 @@
+output "instance_profile_arn" {
+  value = aws_iam_instance_profile.ec2.arn
+}
+
 output "instance_profile_name" {
-  value = module.ec2_iam_role.instance_profile_name
+  value = aws_iam_instance_profile.ec2.name
 }

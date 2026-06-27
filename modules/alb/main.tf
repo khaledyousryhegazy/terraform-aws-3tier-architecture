@@ -7,6 +7,8 @@ module "alb" {
 
   security_groups = [var.alb_sg_id]
 
+  enable_deletion_protection = false
+
   listeners = {
     http = {
       port     = 80
@@ -20,18 +22,21 @@ module "alb" {
 
   target_groups = {
     app = {
-      name_prefix                       = "app"
-      protocol                          = "HTTP"
-      port                              = 80
-      target_type                       = "instance"
+      name_prefix = "${var.target_group_name}-"
+      protocol    = "HTTP"
+      port        = 80
+      target_type = "instance"
+
+      create_attachment = false
+
       deregistration_delay              = 10
-      load_balancing_algorithm_type     = "weighted_random"
-      load_balancing_anomaly_mitigation = "on"
+      load_balancing_algorithm_type     = "round_robin"
+      load_balancing_anomaly_mitigation = "off"
       load_balancing_cross_zone_enabled = "use_load_balancer_configuration"
 
       target_group_health = {
         dns_failover = {
-          minimum_healthy_targets_count = 2
+          minimum_healthy_targets_count = 1
         }
         unhealthy_state_routing = {
           minimum_healthy_targets_percentage = 50
@@ -39,21 +44,10 @@ module "alb" {
       }
 
       health_check = {
-        enabled             = true
-        interval            = 30
-        path                = "/"
-        port                = "traffic-port"
-        healthy_threshold   = 3
-        unhealthy_threshold = 3
-        timeout             = 6
-        protocol            = "HTTP"
-        matcher             = "200-399"
-      }
-
-      protocol_version = "HTTP1"
-      port             = 80
-      tags = {
-        InstanceTargetGroupTag = "baz"
+        enabled  = true
+        path     = "/"
+        port     = "traffic-port"
+        protocol = "HTTP"
       }
     }
   }

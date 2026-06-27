@@ -18,8 +18,16 @@ variable "instance_profile_name" {
   type = string
 }
 
+variable "instance_profile_arn" {
+  type = string
+}
+
 variable "environment" {
   type = string
 }
 
 variable "app_sg_id" {}
+
+variable "target_group_arn" {
+
+}

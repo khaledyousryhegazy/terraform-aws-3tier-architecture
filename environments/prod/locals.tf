@@ -34,10 +34,10 @@ locals {
   region      = "us-east-1"
   azs         = slice(data.aws_availability_zones.available.names, 0, 2)
   latest_ami  = data.aws_ami.amz_ami.id
-  Environment = "Dev"
+  Environment = "PROD"
 
   tags = {
-    Environment = "Dev"
+    Environment = "PROD"
     Example     = local.name_prefix
     Owner       = "Khaled"
   }

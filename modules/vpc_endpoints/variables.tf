@@ -15,3 +15,7 @@ variable "private_subnets" {}
 variable "db_sg_id" {
   type = string
 }
+
+variable "private_route_table_ids" {
+
+}

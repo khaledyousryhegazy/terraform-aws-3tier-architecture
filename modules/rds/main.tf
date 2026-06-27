@@ -32,10 +32,10 @@ module "db" {
   create_db_subnet_group = true
   subnet_ids             = var.database_subnets
 
-  deletion_protection          = true
   storage_encrypted            = true
-  performance_insights_enabled = true
-  multi_az                     = true
+  deletion_protection          = false # free tier
+  performance_insights_enabled = false # free tier
+  multi_az                     = false # free tier
 
-  backup_retention_period = 7
+  # backup_retention_period = 7
 }

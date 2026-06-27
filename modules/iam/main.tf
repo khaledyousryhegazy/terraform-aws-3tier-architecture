@@ -49,3 +49,10 @@ module "ec2_iam_role" {
 
   tags = var.tags
 }
+
+resource "aws_iam_instance_profile" "ec2" {
+  name = "${var.name_prefix}-instance-profile"
+  role = module.ec2_iam_role.name
+
+  tags = var.tags
+}

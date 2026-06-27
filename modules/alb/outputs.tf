@@ -5,3 +5,7 @@ output "target_group_arn" {
 output "alb_dns_name" {
   value = module.alb.dns_name
 }
+
+output "alb_arn_suffix" {
+  value = module.alb.arn_suffix
+}

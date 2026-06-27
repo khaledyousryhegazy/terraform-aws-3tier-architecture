@@ -9,6 +9,13 @@ module "autoscaling" {
   health_check_type   = "ELB"
   vpc_zone_identifier = var.private_subnets
 
+  traffic_source_attachments = {
+    alb = {
+      traffic_source_identifier = var.target_group_arn
+      traffic_source_type       = "elbv2"
+    }
+  }
+
   instance_refresh = {
     strategy = "Rolling"
 
@@ -29,13 +36,14 @@ module "autoscaling" {
   launch_template_description = "launch template for three tier app autoscaling group"
   update_default_version      = true # any change in launch template create new version
 
-  image_id          = var.image_ami
-  instance_type     = var.instance_type
-  ebs_optimized     = true
-  enable_monitoring = true
-
-  iam_instance_profile_name = var.instance_profile_name
-  user_data                 = base64encode(file("${path.module}/userData.sh"))
+  image_id                    = var.image_ami
+  instance_type               = var.instance_type
+  ebs_optimized               = true
+  enable_monitoring           = true
+  key_name                    = "terraform-key"
+  create_iam_instance_profile = false
+  iam_instance_profile_name   = var.instance_profile_name
+  user_data                   = base64encode(file("${path.module}/userData.sh"))
 
   block_device_mappings = [
     {
@@ -52,7 +60,6 @@ module "autoscaling" {
   ]
 
   security_groups = [var.app_sg_id]
-
   metadata_options = {
     http_endpoint               = "enabled"
     http_tokens                 = "required"

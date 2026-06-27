@@ -10,5 +10,5 @@ output "db_sg_id" {
 
 output "alb_sg_id" {
   description = "ALB security group IDS"
-  value       = module.app_sg.id
+  value       = module.alb_sg.id
 }

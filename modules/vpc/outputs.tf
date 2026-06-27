@@ -37,3 +37,7 @@ output "database_subnet_group_name" {
   description = "data base subnet group names"
   value       = module.vpc.database_subnet_group_name
 }
+
+output "private_route_table_ids" {
+  value = module.vpc.private_route_table_ids
+}

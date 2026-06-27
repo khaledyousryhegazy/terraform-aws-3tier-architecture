@@ -10,4 +10,10 @@ variable "public_subnets" {
   type = list(string)
 }
 
-variable "alb_sg_id" {}
+variable "alb_sg_id" {
+  type = string
+}
+
+variable "target_group_name" {
+  type = string
+}

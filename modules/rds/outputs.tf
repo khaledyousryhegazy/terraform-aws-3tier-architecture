@@ -1,4 +1,4 @@
-output "db_instance_id" {
+output "db_identifier" {
   description = "RDS instance ID"
   value       = module.db.db_instance_identifier
 }

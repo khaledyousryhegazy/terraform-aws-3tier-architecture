@@ -44,19 +44,12 @@ module "app_sg" {
       referenced_security_group_id = module.alb_sg.id
     }
 
-    https-from-alb = {
-      from_port                    = 443
-      to_port                      = 443
-      ip_protocol                  = "tcp"
-      referenced_security_group_id = module.alb_sg.id
+    ssh-to-app = {
+      from_port   = 22
+      to_port     = 22
+      ip_protocol = "tcp"
+      cidr_ipv4   = "0.0.0.0/0"
     }
-
-    # ssh-to-app = {
-    #   from_port   = 22
-    #   to_port     = 22
-    #   ip_protocol = "tcp"
-    #   cidr_ipv4   = "0.0.0.0/0"
-    # }
   }
 
   egress_rules = {
@@ -75,7 +68,7 @@ module "db_sg" {
   vpc_id      = var.vpc_id
 
   ingress_rules = {
-    mysql-from-app = {
+    db-from-app = {
       from_port                    = 5432
       to_port                      = 5432
       ip_protocol                  = "tcp"
@@ -83,3 +76,4 @@ module "db_sg" {
     }
   }
 }
+
